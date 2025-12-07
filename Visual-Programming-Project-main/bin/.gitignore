@@ -1,0 +1,19 @@
+# === Java build files ===
+*.class
+/out/
+*.log
+
+# === VS Code settings ===
+.vscode/
+*.code-workspace
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Database or data files ===
+*.db
+data/
+
+# === Ignore IDE folders ===
+.idea/
