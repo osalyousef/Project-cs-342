@@ -1,125 +1,123 @@
 package sections;
 
 import javax.swing.*;
-import services.EventService;
-import models.Event;
+import javax.swing.border.EmptyBorder; // FIXES ERROR
 import java.awt.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-// import sesstion
 import auth.Session;
-
-// import service for registration
+import auth.StyleUtils;
+import models.Event;
 import services.EventService;
 
 public class HomeContentPanel extends JPanel {
+    // --- PUBLIC VARIABLES (FIXES HOMEPAGE ERROR) ---
     public JTextField searchField;
     public JButton textSearchButton, comboSearchButton;
     public JComboBox<String> dateBox, categoryBox, locationBox;
-    public JPanel eventsPanel;
     public JLabel titleLabel;
+    public JPanel eventsPanel;
 
     public HomeContentPanel(String[] dates, String[] categories, String[] locations) {
-        setLayout(null);
-        setBackground(Color.WHITE);
+        setLayout(new BorderLayout());
+        setBackground(StyleUtils.BG_COLOR);
 
-        // Title
-        titleLabel = new JLabel("Current Available Events", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 25));
-        titleLabel.setBounds(0, 0, 800, 80);
-        add(titleLabel);
+        // Header Section
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBorder(BorderFactory.createMatteBorder(0,0,1,0, new Color(200,200,200)));
 
-        // Search field
-        JLabel searchLabel = new JLabel("Search:");
-        searchLabel.setBounds(10, 85, 100, 20);
-        searchLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-        add(searchLabel);
+        // Title Row
+        JPanel titleRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 30, 20));
+        titleRow.setBackground(Color.WHITE);
+        titleLabel = new JLabel("Explore Events");
+        titleLabel.setFont(StyleUtils.FONT_HEADER);
+        titleLabel.setForeground(StyleUtils.PRIMARY_COLOR);
+        titleRow.add(titleLabel);
 
-        searchField = new JTextField();
-        searchField.setBounds(10, 250, 320, 30);
-        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-        searchField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.GRAY));
-        searchField.setBackground(Color.WHITE);
-        searchField.setForeground(Color.DARK_GRAY);
-        add(searchField);
+        // Filter Bar
+        JPanel filterBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        filterBar.setBackground(Color.WHITE);
+        filterBar.setBorder(new EmptyBorder(0, 15, 15, 15)); // Uses imported EmptyBorder
 
-        // Dropdowns
+        // Initialize Components
+        searchField = new JTextField(15);
+        StyleUtils.styleTextField(searchField);
+        
+        textSearchButton = new JButton("Search");
+        StyleUtils.styleButton(textSearchButton);
+
+        // Initialize ComboBoxes
         dateBox = new JComboBox<>(dates);
-        dateBox.setBounds(320, 110, 100, 30);
-        dateBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        dateBox.setBackground(Color.WHITE);
-        dateBox.setForeground(Color.DARK_GRAY);
-        dateBox.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(dateBox);
-
         categoryBox = new JComboBox<>(categories);
-        categoryBox.setBounds(430, 110, 100, 30);
-        categoryBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        categoryBox.setBackground(Color.WHITE);
-        categoryBox.setForeground(Color.DARK_GRAY);
-        categoryBox.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(categoryBox);
-
         locationBox = new JComboBox<>(locations);
-        locationBox.setBounds(540, 110, 100, 30);
-        locationBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        
+        // Basic styling for boxes
+        dateBox.setBackground(Color.WHITE);
+        categoryBox.setBackground(Color.WHITE);
         locationBox.setBackground(Color.WHITE);
-        locationBox.setForeground(Color.DARK_GRAY);
-        locationBox.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(locationBox);
+        
+        comboSearchButton = new JButton("Filter"); 
+        StyleUtils.styleButton(comboSearchButton);
 
+        // Add to Filter Bar
+        filterBar.add(new JLabel("Search:"));
+        filterBar.add(searchField);
+        filterBar.add(textSearchButton);
+        filterBar.add(new JSeparator(SwingConstants.VERTICAL));
+        filterBar.add(new JLabel("Date:"));
+        filterBar.add(dateBox);
+        filterBar.add(new JLabel("Category:"));
+        filterBar.add(categoryBox);
+        filterBar.add(new JLabel("Location:"));
+        filterBar.add(locationBox);
 
-        // Events display panel
-        eventsPanel = new JPanel();
-        eventsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
-        eventsPanel.setBounds(0, 140, 800, 400);
-        eventsPanel.setBackground(Color.WHITE);
-        eventsPanel.setPreferredSize(new Dimension(760, 1000));
-        // add(eventsPanel);
+        headerPanel.add(titleRow);
+        headerPanel.add(filterBar);
+        add(headerPanel, BorderLayout.NORTH);
+
+        // Events Grid
+        eventsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        eventsPanel.setBackground(StyleUtils.BG_COLOR);
+        
         JScrollPane scrollPane = new JScrollPane(eventsPanel);
-        scrollPane.setBounds(0, 140, 800, 400);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
-        add(scrollPane);
-
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     public void addEventCard(int eventId, String name, String location, String date) {
-        JButton card = new JButton();
+        JPanel card = StyleUtils.createCard();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setPreferredSize(new Dimension(200, 100));
-        card.setBackground(new Color(245, 245, 245));
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        card.setPreferredSize(new Dimension(280, 180));
 
-        JLabel nameLabel = new JLabel("Title: " + name);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JLabel nameLabel = new JLabel("<html>" + name + "</html>");
+        nameLabel.setFont(StyleUtils.FONT_BOLD);
+        
+        JLabel locLabel = new JLabel("📍 " + location);
+        locLabel.setFont(StyleUtils.FONT_REGULAR);
+        locLabel.setForeground(StyleUtils.TEXT_LIGHT);
+        
+        JLabel dateLabel = new JLabel("📅 " + date);
+        dateLabel.setFont(StyleUtils.FONT_REGULAR);
+        dateLabel.setForeground(StyleUtils.ACCENT_COLOR);
 
-        JLabel locationLabel = new JLabel("Location: " + location);
-        locationLabel.setFont(new Font("Arial", Font.PLAIN, 13));
-
-        JLabel dateLabel = new JLabel("Date: " + date);
-        dateLabel.setFont(new Font("Arial", Font.ITALIC, 12));
-        dateLabel.setForeground(Color.DARK_GRAY);
-
-        card.add(nameLabel);
-        card.add(locationLabel);
-        card.add(dateLabel);
-
-        card.addActionListener(e -> {
-            int result = JOptionPane.showConfirmDialog(
-                    null,
-                    "Do you want to attend \"" + name + "\"?",
-                    "Register for Event",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (result == JOptionPane.YES_OPTION) {
-                EventService.registerUserForEvent(Session.getUserId(), eventId, Session.getUsername()); // call the
-                // method
-            }
+        JButton attendBtn = new JButton("Book Ticket");
+        StyleUtils.styleButton(attendBtn);
+        attendBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        attendBtn.addActionListener(e -> {
+             int confirm = JOptionPane.showConfirmDialog(null, "Register for " + name + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+             if(confirm == JOptionPane.YES_OPTION) {
+                 EventService.registerUserForEvent(Session.getUserId(), eventId, Session.getUsername());
+             }
         });
+
+        card.add(dateLabel);
+        card.add(Box.createVerticalStrut(5));
+        card.add(nameLabel);
+        card.add(Box.createVerticalStrut(5));
+        card.add(locLabel);
+        card.add(Box.createVerticalGlue());
+        card.add(attendBtn);
 
         eventsPanel.add(card);
         eventsPanel.revalidate();
@@ -129,7 +127,6 @@ public class HomeContentPanel extends JPanel {
     public void searchEvents(String keyword) {
         eventsPanel.removeAll();
         keyword = keyword.toLowerCase().trim();
-
         boolean found = false;
         for (Event ev : EventService.getAllEvents()) {
             if (ev.getName().toLowerCase().contains(keyword)) {
@@ -137,16 +134,12 @@ public class HomeContentPanel extends JPanel {
                 found = true;
             }
         }
-
         if (!found) {
-            JLabel noResults = new JLabel("No events found.");
-            noResults.setFont(new Font("Arial", Font.BOLD, 14));
-            noResults.setForeground(Color.RED);
-            eventsPanel.add(noResults);
+            JLabel noRes = new JLabel("No events found.");
+            noRes.setFont(StyleUtils.FONT_BOLD);
+            eventsPanel.add(noRes);
         }
-
         eventsPanel.revalidate();
         eventsPanel.repaint();
     }
-
 }

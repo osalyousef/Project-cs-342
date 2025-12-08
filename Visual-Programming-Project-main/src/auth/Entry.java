@@ -2,87 +2,84 @@ package auth;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
-public class Entry extends JFrame implements ActionListener {
-    JTextArea Entry;
-    JButton Admin_Button, User_Button;
-
-    Register r = new Register();
-    AdminLogin ad = new AdminLogin();
+public class Entry extends JFrame {
 
     public Entry() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        setTitle("Entry");
-        setSize(500, 350);
+        setTitle("Welcome");
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
 
-        // Main panel
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        // Background
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(StyleUtils.BG_COLOR);
+        add(mainPanel);
 
-        // Welcome text
-        Entry = new JTextArea("Welcome to our event management project\nare you signing in as?");
-        Entry.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        Entry.setEditable(false);
-        Entry.setBackground(Color.WHITE);
-        Entry.setFocusable(false);
-        Entry.setAlignmentX(Component.CENTER_ALIGNMENT);
-        Entry.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
+        // Container
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setBackground(StyleUtils.BG_COLOR);
 
-        // Buttons panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 45, 0));
-        buttonPanel.setBackground(Color.WHITE);
+        // Title
+        JLabel title = new JLabel("Event Management System");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        title.setForeground(StyleUtils.PRIMARY_COLOR);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        User_Button = new JButton("User");
-        User_Button.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        User_Button.setPreferredSize(new Dimension(150, 45));
-        User_Button.setBackground(Color.GRAY);
-        User_Button.setForeground(Color.WHITE);
-        User_Button.setFocusPainted(false);
-        User_Button.setOpaque(true);
-        User_Button.setBorderPainted(false);
+        JLabel subtitle = new JLabel("Please select your role to continue");
+        subtitle.setFont(StyleUtils.FONT_REGULAR);
+        subtitle.setForeground(StyleUtils.TEXT_LIGHT);
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        Admin_Button = new JButton("Admin");
-        Admin_Button.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        Admin_Button.setPreferredSize(new Dimension(150, 45));
-        Admin_Button.setBackground(Color.GRAY);
-        Admin_Button.setForeground(Color.WHITE);
-        Admin_Button.setFocusPainted(false);
-        Admin_Button.setOpaque(true);
-        Admin_Button.setBorderPainted(false);
+        // Buttons Panel
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 40));
+        buttonsPanel.setBackground(StyleUtils.BG_COLOR);
 
-        buttonPanel.add(User_Button);
-        buttonPanel.add(Admin_Button);
+        buttonsPanel.add(createRoleCard("User", "Sign in to browse and book events", e -> {
+            this.setVisible(false);
+            new Login().setVisible(true);
+        }));
 
-        mainPanel.add(Entry);
-        mainPanel.add(buttonPanel);
+        buttonsPanel.add(createRoleCard("Admin", "Manage users, events, and settings", e -> {
+            this.setVisible(false);
+            new AdminLogin().setVisible(true);
+        }));
 
-        add(mainPanel, BorderLayout.CENTER);
+        container.add(title);
+        container.add(Box.createVerticalStrut(10));
+        container.add(subtitle);
+        container.add(Box.createVerticalStrut(40));
+        container.add(buttonsPanel);
 
-        User_Button.addActionListener(this);
-        Admin_Button.addActionListener(this);
-
+        mainPanel.add(container);
+        
+        // --- IMPORTANT: This makes the window show up ---
         setVisible(true);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == User_Button) {
-            this.setVisible(false);
-            Login a = new Login();
-            a.setVisible(true);
-        } else {
-            this.setVisible(false);
-            ad.setVisible(true);
-        }
+    private JPanel createRoleCard(String role, String desc, java.awt.event.ActionListener action) {
+        JPanel card = StyleUtils.createCard();
+        card.setLayout(new BorderLayout());
+        card.setPreferredSize(new Dimension(220, 180));
+        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JLabel roleLabel = new JLabel(role, SwingConstants.CENTER);
+        roleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        roleLabel.setForeground(StyleUtils.PRIMARY_COLOR);
+
+        JLabel descLabel = new JLabel("<html><center>" + desc + "</center></html>", SwingConstants.CENTER);
+        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        descLabel.setForeground(StyleUtils.TEXT_LIGHT);
+
+        JButton btn = new JButton("Select");
+        StyleUtils.styleButton(btn);
+        btn.addActionListener(action);
+
+        card.add(roleLabel, BorderLayout.NORTH);
+        card.add(descLabel, BorderLayout.CENTER);
+        card.add(btn, BorderLayout.SOUTH);
+
+        return card;
     }
 }

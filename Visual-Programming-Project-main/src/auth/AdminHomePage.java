@@ -1,10 +1,9 @@
 package auth;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
-import services.EventService;
 import services.AdminService;
 
 public class AdminHomePage extends JFrame {
@@ -12,146 +11,118 @@ public class AdminHomePage extends JFrame {
     private JPanel contentPanel, menuPanel;
 
     public AdminHomePage() {
-        setTitle("Admin - Dashboard");
-        setSize(1000, 600);
+        setTitle("Admin Dashboard");
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Side menu panel
-        menuPanel = new JPanel(new GridLayout(3, 1, 10, 10));
-        menuPanel.setPreferredSize(new Dimension(200, 0));
-        menuPanel.setBackground(Color.GRAY);
+        // Sidebar
+        menuPanel = new JPanel();
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+        menuPanel.setBackground(StyleUtils.PRIMARY_COLOR);
+        menuPanel.setPreferredSize(new Dimension(250, 0));
+        
+        JLabel brand = new JLabel("ADMIN PANEL");
+        brand.setFont(StyleUtils.FONT_HEADER);
+        brand.setForeground(Color.WHITE);
+        brand.setBorder(new EmptyBorder(30, 30, 30, 30));
+        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        HomeButton = new JButton("Home");
-        EventsButton = new JButton("Events");
-        UsersButton = new JButton("Users");
+        HomeButton = createSidebarBtn("Dashboard");
+        EventsButton = createSidebarBtn("Manage Events");
+        UsersButton = createSidebarBtn("Manage Users");
 
-        configureButton(HomeButton);
-        configureButton(EventsButton);
-        configureButton(UsersButton);
-
+        menuPanel.add(brand);
         menuPanel.add(HomeButton);
         menuPanel.add(EventsButton);
         menuPanel.add(UsersButton);
-
         add(menuPanel, BorderLayout.WEST);
 
-        // Main content panel
+        // Content
         contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(StyleUtils.BG_COLOR);
         setHomeContent();
         add(contentPanel, BorderLayout.CENTER);
 
-        // Menu listener assignment
-        MenuListener menuListener = new MenuListener();
-        HomeButton.addActionListener(menuListener);
-        EventsButton.addActionListener(menuListener);
-        UsersButton.addActionListener(menuListener);
+        // Listener logic
+        MenuListener ml = new MenuListener();
+        HomeButton.addActionListener(ml);
+        EventsButton.addActionListener(ml);
+        UsersButton.addActionListener(ml);
 
         setVisible(true);
     }
 
+    private JButton createSidebarBtn(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(StyleUtils.PRIMARY_COLOR);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(StyleUtils.FONT_REGULAR);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setHorizontalAlignment(SwingConstants.LEFT);
+        btn.setMaximumSize(new Dimension(250, 50));
+        btn.setBorder(new EmptyBorder(15, 30, 15, 0));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
     private void setHomeContent() {
         contentPanel.removeAll();
+        JPanel dash = new JPanel(new FlowLayout(FlowLayout.LEFT, 30, 30));
+        dash.setBackground(StyleUtils.BG_COLOR);
+        dash.setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        JPanel dashboardPanel = new JPanel();
-        dashboardPanel.setLayout(new GridLayout(2, 3, 20, 20)); // 2 rows x 3 columns
-        dashboardPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        dashboardPanel.setBackground(Color.WHITE);
-
-        int usersCount = AdminService.getUsersCount();
-        int eventsCount = AdminService.getEventsCount();
-        int registrationsCount = AdminService.getRegistrationsCount();
-        int categoriesCount = AdminService.getCategoriesCount();
-        int organizersCount = AdminService.getOrganizersCount();
-        int attendeesCount = AdminService.getAttendeesCount();
-
-        dashboardPanel.add(createStatCard("Total Users", usersCount));
-        dashboardPanel.add(createStatCard("Total Events", eventsCount));
-        dashboardPanel.add(createStatCard("Total Registrations", registrationsCount));
-        dashboardPanel.add(createStatCard("Total Categories", categoriesCount));
-        dashboardPanel.add(createStatCard("Total Organizers", organizersCount));
-        dashboardPanel.add(createStatCard("Total Attendees", attendeesCount));
-
-        contentPanel.add(dashboardPanel, BorderLayout.CENTER);
+        dash.add(createStatCard("Total Users", AdminService.getUsersCount(), new Color(59, 130, 246)));
+        dash.add(createStatCard("Total Events", AdminService.getEventsCount(), new Color(16, 185, 129)));
+        dash.add(createStatCard("Registrations", AdminService.getRegistrationsCount(), new Color(245, 158, 11)));
+        
+        contentPanel.add(dash, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
-    private JPanel createStatCard(String title, int count) {
-        JPanel card = new JPanel();
+    private JPanel createStatCard(String title, int count, Color stripColor) {
+        JPanel card = StyleUtils.createCard();
         card.setLayout(new BorderLayout());
-        card.setBackground(new Color(245, 245, 245));
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+        card.setPreferredSize(new Dimension(250, 140));
+        
+        JPanel strip = new JPanel();
+        strip.setBackground(stripColor);
+        strip.setPreferredSize(new Dimension(250, 6));
+        
+        JLabel countLbl = new JLabel(String.valueOf(count));
+        countLbl.setFont(new Font("Segoe UI", Font.BOLD, 48));
+        countLbl.setForeground(StyleUtils.TEXT_DARK);
+        
+        JLabel titleLbl = new JLabel(title);
+        titleLbl.setFont(StyleUtils.FONT_REGULAR);
+        titleLbl.setForeground(StyleUtils.TEXT_LIGHT);
 
-        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-
-        JLabel countLabel = new JLabel(String.valueOf(count), SwingConstants.CENTER);
-        countLabel.setFont(new Font("Arial", Font.BOLD, 36));
-        countLabel.setForeground(Color.DARK_GRAY);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(countLabel, BorderLayout.CENTER);
-
+        card.add(strip, BorderLayout.NORTH);
+        JPanel inner = new JPanel(new GridLayout(2, 1));
+        inner.setBackground(Color.WHITE);
+        inner.add(titleLbl);
+        inner.add(countLbl);
+        inner.setBorder(new EmptyBorder(10, 20, 10, 20));
+        card.add(inner, BorderLayout.CENTER);
         return card;
     }
 
-    // Set users content
-    private void setUsersContent() {
-        contentPanel.removeAll();
-        JLabel usersLabel = new JLabel("Manage Users", SwingConstants.CENTER);
-        usersLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        contentPanel.add(usersLabel, BorderLayout.CENTER);
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-
-    // Set events content using EventsPanel
-    private void setEventsContent() {
-        contentPanel.removeAll();
-        EventsPanel eventsPanel = new EventsPanel();
-        contentPanel.add(eventsPanel, BorderLayout.CENTER);
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-
-    // Button style configuration
-    private void configureButton(JButton button) {
-        button.setBackground(Color.GRAY);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(true);
-        button.setFont(new Font("Arial", Font.BOLD, 16));
-    }
-
-    // Inner class to handle menu button clicks
+    // Keep your inner MenuListener class logic
     private class MenuListener implements ActionListener {
-        @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == HomeButton) {
-                setHomeContent();
-            } else if (e.getSource() == EventsButton) {
+            if (e.getSource() == HomeButton) setHomeContent();
+            else if (e.getSource() == EventsButton) {
                 contentPanel.removeAll();
-                EventsPanel eventsPanel = new EventsPanel();
-                contentPanel.add(eventsPanel, BorderLayout.CENTER);
-                contentPanel.revalidate();
-                contentPanel.repaint();
+                contentPanel.add(new EventsPanel(), BorderLayout.CENTER);
+                contentPanel.revalidate(); contentPanel.repaint();
             } else if (e.getSource() == UsersButton) {
                 contentPanel.removeAll();
-                // Make sure to import com.mycompany.userspanel.UsersPanel if necessary.
-                UsersPanel usersPanel = new UsersPanel();
-                contentPanel.add(usersPanel, BorderLayout.CENTER);
-                contentPanel.revalidate();
-                contentPanel.repaint();
+                contentPanel.add(new UsersPanel(), BorderLayout.CENTER);
+                contentPanel.revalidate(); contentPanel.repaint();
             }
         }
-    }
-
-    public static void main(String[] args) {
-        new AdminHomePage();
     }
 }
