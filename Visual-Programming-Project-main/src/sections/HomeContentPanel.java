@@ -76,13 +76,15 @@ public class HomeContentPanel extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         // Events Grid
-        eventsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+    eventsPanel = new JPanel();
+    eventsPanel.setLayout(new BoxLayout(eventsPanel, BoxLayout.Y_AXIS));  // ✅ Vertical layout
         eventsPanel.setBackground(StyleUtils.BG_COLOR);
-        
-        JScrollPane scrollPane = new JScrollPane(eventsPanel);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        add(scrollPane, BorderLayout.CENTER);
+
+    JScrollPane scrollPane = new JScrollPane(eventsPanel);
+    scrollPane.setBorder(null);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+    add(scrollPane, BorderLayout.CENTER);
     }
 
     public void addEventCard(int eventId, String name, String location, String date) {
