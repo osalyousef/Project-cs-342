@@ -76,36 +76,37 @@ public class HomeContentPanel extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         // Events Grid
-    eventsPanel = new JPanel();
-    eventsPanel.setLayout(new BoxLayout(eventsPanel, BoxLayout.Y_AXIS));  // ✅ Vertical layout
+        eventsPanel = new JPanel();
+        eventsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));  // Grid layout with wrapping
         eventsPanel.setBackground(StyleUtils.BG_COLOR);
+        eventsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-    JScrollPane scrollPane = new JScrollPane(eventsPanel);
-    scrollPane.setBorder(null);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-    add(scrollPane, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(eventsPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     public void addEventCard(int eventId, String name, String location, String date) {
-        JPanel card = StyleUtils.createCard();
+        JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setPreferredSize(new Dimension(280, 180));
+        card.setPreferredSize(new Dimension(250, 150));
+        card.setBackground(Color.LIGHT_GRAY);
+        card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        JLabel nameLabel = new JLabel("<html>" + name + "</html>");
-        nameLabel.setFont(StyleUtils.FONT_BOLD);
-        
-        JLabel locLabel = new JLabel("📍 " + location);
-        locLabel.setFont(StyleUtils.FONT_REGULAR);
-        locLabel.setForeground(StyleUtils.TEXT_LIGHT);
-        
-        JLabel dateLabel = new JLabel("📅 " + date);
-        dateLabel.setFont(StyleUtils.FONT_REGULAR);
-        dateLabel.setForeground(StyleUtils.ACCENT_COLOR);
+        JLabel nameLabel = new JLabel("Name: " + name);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
-        JButton attendBtn = new JButton("Book Ticket");
-        StyleUtils.styleButton(attendBtn);
-        attendBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel locLabel = new JLabel("Location: " + location);
+        locLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+
+        JLabel dateLabel = new JLabel("Date: " + date);
+        dateLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+
+        JButton attendBtn = new JButton("Register");
+        attendBtn.setBackground(Color.GRAY);
+        attendBtn.setForeground(Color.WHITE);
         attendBtn.addActionListener(e -> {
              int confirm = JOptionPane.showConfirmDialog(null, "Register for " + name + "?", "Confirm", JOptionPane.YES_NO_OPTION);
              if(confirm == JOptionPane.YES_OPTION) {
@@ -113,12 +114,12 @@ public class HomeContentPanel extends JPanel {
              }
         });
 
-        card.add(dateLabel);
-        card.add(Box.createVerticalStrut(5));
         card.add(nameLabel);
         card.add(Box.createVerticalStrut(5));
         card.add(locLabel);
-        card.add(Box.createVerticalGlue());
+        card.add(Box.createVerticalStrut(5));
+        card.add(dateLabel);
+        card.add(Box.createVerticalStrut(10));
         card.add(attendBtn);
 
         eventsPanel.add(card);

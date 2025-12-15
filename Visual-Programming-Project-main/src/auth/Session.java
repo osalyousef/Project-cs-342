@@ -34,4 +34,12 @@ public class Session {
     public static String getRole() {
         return role;
     }
+
+    public static void clearSession() {
+        userId = 0;
+        username = null;
+        email = null;
+        password = null;
+        role = null;
+    }
 }

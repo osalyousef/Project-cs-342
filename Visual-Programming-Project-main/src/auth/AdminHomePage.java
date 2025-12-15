@@ -7,7 +7,7 @@ import java.awt.event.*;
 import services.AdminService;
 
 public class AdminHomePage extends JFrame {
-    private JButton HomeButton, EventsButton, UsersButton;
+    private JButton HomeButton, EventsButton, UsersButton, LogoutButton;
     private JPanel contentPanel, menuPanel;
 
     public AdminHomePage() {
@@ -17,27 +17,46 @@ public class AdminHomePage extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Sidebar
-        menuPanel = new JPanel();
-        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+        // Top Navigation Bar
+        menuPanel = new JPanel(new BorderLayout());
         menuPanel.setBackground(StyleUtils.PRIMARY_COLOR);
-        menuPanel.setPreferredSize(new Dimension(250, 0));
-        
+        menuPanel.setPreferredSize(new Dimension(0, 70));
+        menuPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+        // Left Section - Brand
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftPanel.setBackground(StyleUtils.PRIMARY_COLOR);
+
         JLabel brand = new JLabel("ADMIN PANEL");
-        brand.setFont(StyleUtils.FONT_HEADER);
+        brand.setFont(new Font("Segoe UI", Font.BOLD, 24));
         brand.setForeground(Color.WHITE);
-        brand.setBorder(new EmptyBorder(30, 30, 30, 30));
-        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
+        brand.setBorder(new EmptyBorder(0, 10, 0, 30));
+        leftPanel.add(brand);
 
-        HomeButton = createSidebarBtn("Dashboard");
-        EventsButton = createSidebarBtn("Manage Events");
-        UsersButton = createSidebarBtn("Manage Users");
+        // Center Section - Navigation Buttons
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        centerPanel.setBackground(StyleUtils.PRIMARY_COLOR);
 
-        menuPanel.add(brand);
-        menuPanel.add(HomeButton);
-        menuPanel.add(EventsButton);
-        menuPanel.add(UsersButton);
-        add(menuPanel, BorderLayout.WEST);
+        HomeButton = createNavButton("Dashboard");
+        EventsButton = createNavButton("Manage Events");
+        UsersButton = createNavButton("Manage Users");
+
+        centerPanel.add(HomeButton);
+        centerPanel.add(EventsButton);
+        centerPanel.add(UsersButton);
+
+        // Right Panel - Logout button
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        rightPanel.setBackground(StyleUtils.PRIMARY_COLOR);
+
+        LogoutButton = createLogoutButton();
+        rightPanel.add(LogoutButton);
+
+        menuPanel.add(leftPanel, BorderLayout.WEST);
+        menuPanel.add(centerPanel, BorderLayout.CENTER);
+        menuPanel.add(rightPanel, BorderLayout.EAST);
+
+        add(menuPanel, BorderLayout.NORTH);
 
         // Content
         contentPanel = new JPanel(new BorderLayout());
@@ -50,21 +69,54 @@ public class AdminHomePage extends JFrame {
         HomeButton.addActionListener(ml);
         EventsButton.addActionListener(ml);
         UsersButton.addActionListener(ml);
+        LogoutButton.addActionListener(ml);
 
         setVisible(true);
     }
 
-    private JButton createSidebarBtn(String text) {
+    private JButton createNavButton(String text) {
         JButton btn = new JButton(text);
-        btn.setBackground(StyleUtils.PRIMARY_COLOR);
+        btn.setBackground(new Color(45, 55, 72)); // Slightly lighter than primary
         btn.setForeground(Color.WHITE);
-        btn.setFont(StyleUtils.FONT_REGULAR);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setHorizontalAlignment(SwingConstants.LEFT);
-        btn.setMaximumSize(new Dimension(250, 50));
-        btn.setBorder(new EmptyBorder(15, 30, 15, 0));
+        btn.setBorder(new EmptyBorder(8, 20, 8, 20));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Hover effect
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setBackground(StyleUtils.ACCENT_COLOR);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setBackground(new Color(45, 55, 72));
+            }
+        });
+
+        return btn;
+    }
+
+    private JButton createLogoutButton() {
+        JButton btn = new JButton("Logout");
+        btn.setBackground(new Color(220, 53, 69)); // Red color for logout
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(8, 20, 8, 20));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Hover effect
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setBackground(new Color(200, 35, 51)); // Darker red on hover
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setBackground(new Color(220, 53, 69));
+            }
+        });
+
         return btn;
     }
 
@@ -122,6 +174,17 @@ public class AdminHomePage extends JFrame {
                 contentPanel.removeAll();
                 contentPanel.add(new UsersPanel(), BorderLayout.CENTER);
                 contentPanel.revalidate(); contentPanel.repaint();
+            } else if (e.getSource() == LogoutButton) {
+                int confirm = JOptionPane.showConfirmDialog(AdminHomePage.this,
+                    "Are you sure you want to logout?",
+                    "Confirm Logout",
+                    JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    Session.clearSession();
+                    dispose();
+                    new AdminLogin();
+                }
             }
         }
     }

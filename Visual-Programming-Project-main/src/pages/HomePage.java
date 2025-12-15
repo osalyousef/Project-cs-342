@@ -18,7 +18,7 @@ import auth.Events;
 import auth.EventsDataBase;
 // import db.DBConnection;
 // import sectiomns
-import sections.SideMenuPanel;
+import sections.TopMenuPanel;
 import sections.HomeContentPanel;
 import sections.ProfilePanel;
 import sections.TicketsPanel;
@@ -36,7 +36,7 @@ import services.EventService;
 public class HomePage extends JFrame implements ActionListener {
     // Menu and main components
     private JButton Home_Button, Tickets_Button, Event_Management_Button, Profile_Button, Notification_Button,
-            Text_Search_Button; // menu
+            Text_Search_Button, Logout_Button; // menu
     private JButton Create_Event_Button, Combo_Search_Button;
     private JPanel menuPanel, Tickets_Panel, contentPanel, Event_Management_Panel, Profile_Panel, Notification_Panel,
             mainPanel, eventsPanel;
@@ -108,16 +108,17 @@ public class HomePage extends JFrame implements ActionListener {
         Password_Label = new JLabel("Password: ********");
         Notification_Label = new JLabel("Notifications", SwingConstants.CENTER);
 
-        // Side menu panel
-        SideMenuPanel sideMenu = new SideMenuPanel(this);
+        // Top menu panel
+        TopMenuPanel topMenu = new TopMenuPanel(this);
 
-        Home_Button = sideMenu.homeButton;
-        Tickets_Button = sideMenu.ticketsButton;
-        Event_Management_Button = sideMenu.eventMgmtButton;
-        Profile_Button = sideMenu.profileButton;
-        Notification_Button = sideMenu.notificationsButton;
+        Home_Button = topMenu.homeButton;
+        Tickets_Button = topMenu.ticketsButton;
+        Event_Management_Button = topMenu.eventMgmtButton;
+        Profile_Button = topMenu.profileButton;
+        Notification_Button = topMenu.notificationsButton;
+        Logout_Button = topMenu.logoutButton;
 
-        menuPanel = sideMenu;
+        menuPanel = topMenu;
 
         // ===== MAIN PANEL =====
         mainPanel = new JPanel(new BorderLayout());
@@ -216,7 +217,7 @@ public class HomePage extends JFrame implements ActionListener {
 
         // =============== menu and main JPanels ADDED TO JFRAME =========
         mainPanel.add(contentPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.WEST);
+        add(menuPanel, BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
         setVisible(true);
 
@@ -274,6 +275,18 @@ public class HomePage extends JFrame implements ActionListener {
             NotificationPanel newNotifPanel = new NotificationPanel();
             Notification_Panel = newNotifPanel;
             mainPanel.add(Notification_Panel, BorderLayout.CENTER);
+        } else if (e.getSource() == Logout_Button) { // === LOGOUT ===
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                Session.clearSession();
+                this.dispose();
+                new auth.Login();
+            }
+            return; // Don't revalidate/repaint if logging out
         }
 
         else if (e.getSource() == Create_Event_Button) { // === FOR THE CREATE EVENT BUTTON IN EVENT MANAGEMENT PANEL
